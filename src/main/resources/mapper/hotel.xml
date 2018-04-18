@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nefu.springboot.dao.HotelDao">
+	<!-- 酒店相关的sql操作 -->
+	<insert id="addHotel" parameterType="hashmap">
+		insert into hotel value(null,#{name},#{address},#{star},#{phone},#{openTime},#{picture},#{flag},#{consumer_id},#{status},#{grade})
+	</insert>
+	<select id="getHotelInfo" parameterType="int" resultType="hashmap">
+		select * from hotel where status = "Y"
+			<if test="id != 0">
+				and consumer_id = #{id}
+			</if>
+		
+	</select>
+	<update id="updateStatus" parameterType="hashmap">
+		update ${table} set
+			   status = #{status}
+			   where ${field} = #{id}
+	</update>
+	<update id="updateHotel" parameterType="com.nefu.springboot.vo.Hotel">
+		update hotel set 
+			   name = #{name}, 
+			   address = #{address}, 
+			   phone = #{phone}
+			   where hotel_id = #{hotel_id}
+	</update>
+	
+	<!-- 酒店房型相关的sql操作 -->
+	<insert id="addProduce" parameterType="hashmap" useGeneratedKeys="true" keyProperty="id">
+		insert into produce value(null,#{hotel_id},#{houseType},#{bedType},#{price},#{amount},#{startDate},#{endDate},#{picture},#{capacity},#{flag},#{status})
+	</insert>
+	
+	<select id="getProInfo" parameterType="int" resultType="hashmap">
+		select p.*, h.name as hotelName
+		       from produce p ,hotel h
+		       where p.hotel_id = h.hotel_id
+		       and p.status = 'Y'
+		       and p.hotel_id in
+               (select hotel.hotel_id
+               from consumer,hotel
+			   where consumer.id = hotel.consumer_id
+			   and hotel.status = 'Y'
+			 <if test="id != 0">
+			   and consumer_id = #{id}
+			 </if>) 
+	</select>
+	
+	<!-- 房型日期的相关sql操作 -->
+	<insert id="addProduceTime" parameterType="hashmap">
+		insert into produce_time value(null,#{produce_id},#{startDate},#{endDate},#{isReserve},#{restAmount})
+	</insert>
+	
+	<update id="updatePro" parameterType="com.nefu.springboot.vo.Produce">
+		update produce set
+			   houseType = #{houseType},
+			   price = #{price}
+			   where produce_id = #{produce_id}
+	</update>
+	
+	<!-- 酒店组合房型的相关sql -->
+	<select id="getHotelProduceInfo" resultType="hashmap">
+		select h.hotel_id as "hotel_id",
+			   h.name as "hotel_name",
+			   h.address as "hotel_address",
+			   h.picture as "hotel_picture",
+			   h.grade as "hotel_grade",
+			   min(p.price) as "min_price"
+			   from hotel h, produce p 
+			   where h.hotel_id = p.hotel_id
+               and p.status = "Y"
+               group by h.hotel_id
+	</select>
+	<select id="getHotelProInfoById" parameterType="int" resultMap="hotelProInfoMap">
+		select h.hotel_id as hotel_id,
+			   h.name as hotel_name,
+			   h.address hotel_address,
+			   h.star as hotel_star,
+			   h.phone as hotel_phone,
+			   h.flag as hotel_fag,
+			   h.picture as hotel_picture,
+			   h.grade as hotel_grade,
+			   p.produce_id as pro_id,
+ 			   p.houseType as pro_houseType,
+ 			   p.bedType as pro_bedType,
+ 			   p.picture as pro_picture,
+ 			   p.price as pro_price,
+ 			   p.flag as pro_flag,
+ 			   pt.restAmount as pt_restAmount
+               from hotel h, produce p,produce_time pt
+               where h.hotel_id = p.hotel_id
+               and p.produce_id = pt.produce_id
+			   and h.hotel_id = #{hotel_id}
+               and pt.startDate = '2018-04-17'
+               and pt.endDate = '2018-04-18'
+               and p.status = 'Y'
+	</select>
+	
+	<resultMap type="hashmap" id="hotelProInfoMap" >
+		<id column="hotel_id" property="hotel_id"/>
+		<result column="hotel_name" property="hotel_name"/>
+		<result column="hotel_address" property="hotel_address"/>
+		<result column="hotel_star" property="hotel_star"/>
+		<result column="hotel_phone" property="hotel_phone"/>
+		<result column="hotel_fag" property="hotel_fag"/>
+		<result column="hotel_picture" property="hotel_picture"/>
+		<result column="hotel_grade" property="hotel_grade"/>
+		<collection property="pro_info" ofType="hashmap">
+			<id column="pro_id" property="proId"/>
+			<result column="pro_houseType" property="pro_houseType"/>
+			<result column="pro_bedType" property="pro_bedType"/>
+			<result column="pro_picture" property="pro_picture"/>
+			<result column="pro_price" property="pro_price"/>
+			<result column="pro_flag" property="pro_flag"/>
+			<result column="pt_restAmount" property="pt_restAmount"/>
+		</collection>
+	</resultMap>
+	
+</mapper>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nefu.springboot.dao.ConsumerDao">
+	<insert id="addConsumer" parameterType="com.nefu.springboot.vo.Consumer">
+		insert into consumer value(null,#{name},#{email},#{password},#{identifyingCode})
+	</insert>
+	<update id="updateConsumer" parameterType="com.nefu.springboot.vo.Consumer">
+		update consumer set password = #{password},name = #{name},identifyingCode = #{identifyingCode} where email = #{email}
+	</update>
+	<select id="getConsumer" parameterType="String" resultType="com.nefu.springboot.vo.Consumer">
+		select * from consumer c where email = #{email}
+	</select>
+</mapper>

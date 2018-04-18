@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="http://ehcache.org/ehcache.xsd"
+	updateCheck="false">
+	<diskStore path="java.io.tmpdir/Tmp_EhCache" />
+
+	<!-- 默认配置 -->
+	<defaultCache maxElementsInMemory="5000" eternal="false"	
+	timeToLiveSeconds="300" timeToIdleSeconds="300"	
+		memoryStoreEvictionPolicy="LRU" overflowToDisk="false" />
+		
+	<!-- eternal：是否持久化对象缓存（当为true时，对象永不过期，设置的时间均无效） -->	
+	<!-- timeToLiveSeconds：缓存对象的最大生存周期 （0表示无穷） -->
+	<!-- timeToIdleSeconds：缓存对象的最大空闲时间 （0表示无穷） -->
+	<!-- LRU（最近最少使用，默认策略）、FIFO（先进先出）、LFU（最少访问次数）。  -->
+	
+	<cache name="baseCache" maxElementsInMemory="5000" eternal="false"
+	timeToLiveSeconds="300" timeToIdleSeconds="300"
+		memoryStoreEvictionPolicy="LRU" overflowToDisk="false" />
+
+</ehcache>
