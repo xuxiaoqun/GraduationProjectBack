@@ -75,7 +75,7 @@ public interface HotelService {
 	/**
 	 * 获取所有的酒店和酒店下面的房型的组合信息
 	 */
-	public List<Map<String, Object>> getHotelProduceInfo();
+	public List<Map<String, Object>> getHotelProduceInfo(String startDate, String endDate);
 
 	/**
 	 * 获取单个酒店下的房型信息
@@ -83,6 +83,6 @@ public interface HotelService {
 	 * @param hotel_id
 	 * @return
 	 */
-	public Map<String, Object> getHotelProInfoById(int hotel_id);
+	public Map<String, Object> getHotelProInfoById(int hotel_id, String startDate, String endDate);
 
 }

@@ -88,13 +88,12 @@ public class BusinessController {
 	}
 	
 	@RequestMapping("/getHotelProInfo")
-	public List<Map<String, Object>> getHotelProduceInfo() {
-		return hotelService.getHotelProduceInfo();
+	public List<Map<String, Object>> getHotelProduceInfo(String startDate,String endDate) {
+		return hotelService.getHotelProduceInfo(startDate,endDate);
 	}
 	
 	@RequestMapping("/getHotelProInfoById")
-	public Map<String, Object> getHotelProInfoById(String hotel_id) {
-		System.out.println(hotel_id);
-		return hotelService.getHotelProInfoById(Integer.valueOf(hotel_id));
+	public Map<String, Object> getHotelProInfoById(String hotel_id,String startDate,String endDate) {
+		return hotelService.getHotelProInfoById(Integer.valueOf(hotel_id), startDate, endDate);
 	}
 }

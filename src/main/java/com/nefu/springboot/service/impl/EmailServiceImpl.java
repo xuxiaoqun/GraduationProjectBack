@@ -41,8 +41,15 @@ public class EmailServiceImpl implements EmailService {
 	}
 
 	@Override
-	public String emailInform(Map<String, Object> model) throws Exception {
-		Template template = freeMarkerConfigurer.getConfiguration().getTemplate("emailInform.ftl", "utf-8");
+	public String emailInformConsumer(Map<String, Object> model) throws Exception {
+		Template template = freeMarkerConfigurer.getConfiguration().getTemplate("informConsumer.ftl", "utf-8");
+		String text = FreeMarkerTemplateUtils.processTemplateIntoString(template, model);
+		return text;
+	}
+
+	@Override
+	public String emailInformBusiness(Map<String, Object> model) throws Exception {
+		Template template = freeMarkerConfigurer.getConfiguration().getTemplate("informBusiness.ftl", "utf-8");
 		String text = FreeMarkerTemplateUtils.processTemplateIntoString(template, model);
 		return text;
 	}

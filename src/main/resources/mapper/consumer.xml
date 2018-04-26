@@ -3,7 +3,7 @@
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.nefu.springboot.dao.ConsumerDao">
-	<insert id="addConsumer" parameterType="com.nefu.springboot.vo.Consumer">
+	<insert id="addConsumer" parameterType="com.nefu.springboot.vo.Consumer" useGeneratedKeys="true" keyProperty="id">
 		insert into consumer value(null,#{name},#{email},#{password},#{identifyingCode})
 	</insert>
 	<update id="updateConsumer" parameterType="com.nefu.springboot.vo.Consumer">
@@ -11,5 +11,30 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	</update>
 	<select id="getConsumer" parameterType="String" resultType="com.nefu.springboot.vo.Consumer">
 		select * from consumer c where email = #{email}
+	</select>
+	<select id="getCredit" parameterType="int" resultType="com.nefu.springboot.vo.Credit">
+		select * from credit where consumer_id = #{id}
+	</select>
+	<insert id="saveCredit" parameterType="com.nefu.springboot.vo.Credit">
+		insert into credit value(null,#{phone},#{idCard},#{bankCard},#{creditIndex},#{consumer_id})
+	</insert>
+	<update id="updateCredit" parameterType="com.nefu.springboot.vo.Credit">
+		update credit set phone = #{phone},idCard = #{idCard},bankCard = #{bankCard} where consumer_id = #{consumer_id}
+	</update>
+	<select id="getAccount" parameterType="int" resultType="com.nefu.springboot.vo.Account">
+		select * from account where consumer_id = #{consumer_id}
+	</select>
+	
+	<insert id="saveAccount" parameterType="com.nefu.springboot.vo.Account" useGeneratedKeys="true" keyProperty="account_id">
+		insert into account value(null,#{consumer_id},#{balance})
+	</insert>
+	<update id="updateAccount" parameterType="com.nefu.springboot.vo.Account">
+		update account set balance = #{balance} where account_id = #{account_id}
+	</update>
+	<insert id="saveBill" parameterType="com.nefu.springboot.vo.Bill">
+		insert into bill value(null,#{account_id},#{recharge},#{consume})
+	</insert>
+	<select id="getBill" parameterType="int" resultType="com.nefu.springboot.vo.Bill">
+		select * from bill where account_id = #{account_id}
 	</select>
 </mapper>

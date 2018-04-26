@@ -31,8 +31,8 @@ public interface HotelDao {
 	
 	public void updatePro(Produce produce);
 	
-	public List<Map<String, Object>> getHotelProduceInfo();
+	public List<Map<String, Object>> getHotelProduceInfo(Map<String, Object> parm);
 	
-	public Map<String, Object> getHotelProInfoById(@Param("hotel_id") int hotel_id);
+	public List<Map<String, Object>> getHotelProInfoById(Map<String, Object> parm);
 
 }

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nefu.springboot.dao.OrderDao">
+	<insert id="saveOrder" parameterType="com.nefu.springboot.vo.Order">
+		insert into graduation.order value(null,#{consumer_id},#{occupant_name},#{occupant_email},#{produce_id},#{arrivalDate},#{leaveDate},#{order_time},#{is_payment},#{order_total},#{produce_amount},#{hotel_id})
+	</insert>
+	
+	<select id="getConsumerByHotelId" parameterType="int" resultType="hashmap">
+		select c.name, c.email
+		      from hotel h, consumer c
+			  where h.consumer_id = c.id
+              and h.hotel_id = #{hotel_id}
+	</select>
+	
+	<select id="getConsumerByConsumerID" parameterType="int" resultType="hashmap">
+		select c.email, c.name 
+			   from consumer c
+			   where c.id = #{consumer_id}
+	</select>
+	
+	<select id="getOrderByConsumerId" resultType="hashmap" parameterType="int">
+		select h.hotel_id,h.name,h.address,h.phone,p.houseType,p.bedType,
+		       o.arrivalDate,o.leaveDate,o.order_id,o.occupant_name,
+               o.occupant_email,o.is_payment,o.order_total,o.order_time,o.produce_amount
+               from hotel h, produce p,graduation.order o
+               where h.hotel_id = o.hotel_id
+               and p.produce_id = o.produce_id
+               and o.consumer_id = #{consumer_id}
+               order by o.order_time desc
+	</select>
+	<update id="updateIsPay" parameterType="hashmap">
+		update graduation.order set is_payment = #{is_payment} where order_id = #{order_id}
+	</update>
+</mapper>

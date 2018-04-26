@@ -1,5 +1,7 @@
 package com.nefu.springboot.controller;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -50,8 +52,9 @@ public class FirstWebController {
 	
 	@RequestMapping("/login")
 	@ResponseBody
-	public Consumer login(Consumer consumer){
+	public Consumer login(Consumer consumer,HttpServletRequest request){
 		if (consumerService.isLogin(consumer)) {
+			request.getSession().setAttribute("consumer", consumer);
 			return consumerService.getConsumerByEmail(consumer.getEmail());
 		}
 		return null;

@@ -1,6 +1,10 @@
 package com.nefu.springboot.service;
 
+import java.util.Map;
+
+import com.nefu.springboot.vo.Account;
 import com.nefu.springboot.vo.Consumer;
+import com.nefu.springboot.vo.Credit;
 
 public interface ConsumerService {
 	
@@ -37,4 +41,38 @@ public interface ConsumerService {
 	 */
 	public Boolean isLogin(Consumer consumer);
 
+	/**
+	 * 根据用户id查找用户的信用信息
+	 * @param id
+	 * @return
+	 */
+	public Credit getCredit(int id);
+	
+	/**
+	 * 保存用户的信用信息
+	 * @param credit
+	 */
+	public void saveCredit(Credit credit);
+	
+	/**
+	 * 更新用户信用信息
+	 * @param credit
+	 */
+	public void updateCredit(Credit credit);
+	
+	/**
+	 * 根据用户id查找当前账户信息和账单信息
+	 * @param id
+	 * @return
+	 */
+	public Map<String, Object> getAccount(int consumer_id);
+	
+	/**
+	 * 保存账户和账户信息
+	 * @param account
+	 */
+	public void updateAccountandBill(Account account);
+	
+	public Account getAccountBalance(int consumer_id);
+	
 }

@@ -1,6 +1,7 @@
 package com.nefu.springboot.service.impl;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -49,7 +50,7 @@ public class HotelServiceImpl implements HotelService {
 		data.put("flag", getString(hotel.getFlag()));
 		data.put("consumer_id", hotel.getConsumer_id());
 		data.put("status", "Y");
-		data.put("grade", "");
+		data.put("grade", 0);
 		hotelDao.addHotel(data);
 	}
 
@@ -142,9 +143,8 @@ public class HotelServiceImpl implements HotelService {
 			Map<String, Object> parm = new HashMap<String, Object>();
 			parm.put("produce_id", data.get("id"));
 			for (int i = 0; i < days; i++) {
-				parm.put("startDate", DateFormatUtils.format(DateUtils.addDays(start, i), "yyyy-MM-dd"));
-				parm.put("endDate", DateFormatUtils.format(DateUtils.addDays(start, i + 1), "yyyy-MM-dd"));
-				parm.put("isReserve", "N");
+				parm.put("arrivalDate", DateFormatUtils.format(DateUtils.addDays(start, i), "yyyy-MM-dd"));
+				parm.put("leaveDate", DateFormatUtils.format(DateUtils.addDays(start, i + 1), "yyyy-MM-dd"));
 				parm.put("restAmount", restAmount);
 				hotelDao.addProduceTime(parm);
 			}
@@ -181,25 +181,69 @@ public class HotelServiceImpl implements HotelService {
 	}
 
 	@Override
-	public List<Map<String, Object>> getHotelProduceInfo() {
-		List<Map<String, Object>> hotelProList = hotelDao.getHotelProduceInfo();
+	public List<Map<String, Object>> getHotelProduceInfo(String startDate, String endDate) {
+		Map<String, Object> parm = new HashMap<String, Object>();
+		parm.put("arrivalDate", startDate);
+		parm.put("leaveDate", endDate);
+		List<Map<String, Object>> hotelProList = hotelDao.getHotelProduceInfo(parm);
 		for (Map<String, Object> hotelPro : hotelProList) {
 			String[] pictures = MapUtils.getString(hotelPro, "hotel_picture").split(",");
 			hotelPro.put("hotel_picture", pictures);
+			hotelPro.put("hotel_grade", MapUtils.getFloat(hotelPro, "hotel_grade"));
 		}
 		return hotelProList;
 	}
 
 	
 	@Override
-	public Map<String, Object> getHotelProInfoById(int hotel_id) {
-		Map<String, Object> hotelPro = hotelDao.getHotelProInfoById(hotel_id);	
-//			String[] hotel_picture = MapUtils.getString(hotelPro, "hotel_picture").split(",");
-//			hotelPro.put("hotel_picture", hotel_picture);		
-//			String[] pro_picture = MapUtils.getString(MapUtils.getMap(hotelPro, "pro_info"), "pro_picture").split(",");
-//			MapUtils.getMap(hotelPro, "pro_info").put("pro_picture", pro_picture);
+	public Map<String, Object> getHotelProInfoById(int hotel_id, String startDate, String endDate) {
+		Map<String, Object> parm = new HashMap<String, Object>();
+		parm.put("arrivalDate", startDate);
+		parm.put("leaveDate", endDate);
+		parm.put("hotel_id", hotel_id);
+		List<Map<String, Object>> hotelProList = hotelDao.getHotelProInfoById(parm);
+		if (hotelProList.size() == 0 || hotelProList.isEmpty()) {
+			return null;
+		}
+		
+		Map<String, Object> hotelProData = new HashMap<String, Object>();
+		List<Map<String, Object>> proList = new ArrayList<Map<String, Object>>();
+		
+		//组装数据格式
+		for(Map<String, Object> hotelPro : hotelProList){
+			hotelProData.put("hotel_address", MapUtils.getString(hotelPro, "hotel_address"));
+			
+			hotelProData.put("hotel_grade", MapUtils.getFloat(hotelPro, "hotel_grade"));
+			hotelProData.put("hotel_id", MapUtils.getInteger(hotelPro, "hotel_id"));
+			hotelProData.put("hotel_name", MapUtils.getString(hotelPro, "hotel_name"));
+			hotelProData.put("hotel_phone", MapUtils.getString(hotelPro, "hotel_phone"));
+			hotelProData.put("hotel_star", MapUtils.getString(hotelPro, "hotel_star"));
+			hotelProData.put("hotel_opemTime", MapUtils.getString(hotelPro, "hotel_opemTime"));
+
+			String[] hotel_picture = MapUtils.getString(hotelPro, "hotel_picture").split(",");
+			hotelProData.put("hotel_picture", hotel_picture);
+			
+			String[] hotel_fag = MapUtils.getString(hotelPro, "hotel_fag").split(",");
+			hotelProData.put("hotel_fag", hotel_fag);
+			
+			Map<String, Object> pro = new HashMap<String, Object>();
+			pro.put("pro_houseType", MapUtils.getString(hotelPro, "pro_houseType"));
+			pro.put("pro_bedType", MapUtils.getString(hotelPro, "pro_bedType"));
+			pro.put("pro_price", MapUtils.getString(hotelPro, "pro_price"));
+			pro.put("pro_id", MapUtils.getInteger(hotelPro, "pro_id"));
+			pro.put("pt_restAmount", MapUtils.getString(hotelPro, "pt_restAmount"));
+			String[] pro_flag = MapUtils.getString(hotelPro, "pro_flag").split(",");
+			pro.put("pro_flag", pro_flag);
+			String[] pro_picture = MapUtils.getString(hotelPro, "pro_picture").split(",");
+			pro.put("pro_picture", pro_picture);
+			
+			proList.add(pro);
+			
+		}
+		
+		hotelProData.put("pro_info", proList);
 				
-		return hotelPro;
+		return hotelProData;
 	}
 
 }

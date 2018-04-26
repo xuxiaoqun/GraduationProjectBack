@@ -60,19 +60,21 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	</update>
 	
 	<!-- 酒店组合房型的相关sql -->
-	<select id="getHotelProduceInfo" resultType="hashmap">
+	<select id="getHotelProduceInfo" resultType="hashmap" parameterType="hashmap">
 		select h.hotel_id as "hotel_id",
 			   h.name as "hotel_name",
 			   h.address as "hotel_address",
 			   h.picture as "hotel_picture",
 			   h.grade as "hotel_grade",
 			   min(p.price) as "min_price"
-			   from hotel h, produce p 
+			   from hotel h, produce p, produce_time pt
 			   where h.hotel_id = p.hotel_id
                and p.status = "Y"
+               and pt.arrivalDate = #{arrivalDate}
+               and pt.leaveDate = #{leaveDate}
                group by h.hotel_id
 	</select>
-	<select id="getHotelProInfoById" parameterType="int" resultMap="hotelProInfoMap">
+	<select id="getHotelProInfoById" parameterType="hashmap" resultType="hashmap">
 		select h.hotel_id as hotel_id,
 			   h.name as hotel_name,
 			   h.address hotel_address,
@@ -80,6 +82,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			   h.phone as hotel_phone,
 			   h.flag as hotel_fag,
 			   h.picture as hotel_picture,
+			   h.openTime as hotel_opemTime,
 			   h.grade as hotel_grade,
 			   p.produce_id as pro_id,
  			   p.houseType as pro_houseType,
@@ -92,12 +95,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                where h.hotel_id = p.hotel_id
                and p.produce_id = pt.produce_id
 			   and h.hotel_id = #{hotel_id}
-               and pt.startDate = '2018-04-17'
-               and pt.endDate = '2018-04-18'
+               and pt.arrivalDate = #{arrivalDate}
+               and pt.leaveDate = #{leaveDate}
                and p.status = 'Y'
 	</select>
 	
-	<resultMap type="hashmap" id="hotelProInfoMap" >
+	<!-- <resultMap type="hashmap" id="hotelProInfoMap" >
 		<id column="hotel_id" property="hotel_id"/>
 		<result column="hotel_name" property="hotel_name"/>
 		<result column="hotel_address" property="hotel_address"/>
@@ -115,6 +118,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<result column="pro_flag" property="pro_flag"/>
 			<result column="pt_restAmount" property="pt_restAmount"/>
 		</collection>
-	</resultMap>
+	</resultMap> -->
 	
 </mapper>

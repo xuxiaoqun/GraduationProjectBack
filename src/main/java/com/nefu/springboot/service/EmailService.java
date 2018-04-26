@@ -12,9 +12,16 @@ public interface EmailService {
 	public String emailValidate(Map<String, Object> model) throws Exception;
 
 	/**
-	 * 预订酒店时的通知模板内容
+	 * 预订酒店时的通知用户模板内容
 	 * @param model 邮件中插入的信息
 	 * @return
 	 */
-	public String emailInform(Map<String, Object> model) throws Exception;
+	public String emailInformConsumer(Map<String, Object> model) throws Exception;
+	
+	/**
+	 * 预订酒店时的通知商家模板内容
+	 * @param model 邮件中插入的信息
+	 * @return
+	 */
+	public String emailInformBusiness(Map<String, Object> model) throws Exception;
 }
