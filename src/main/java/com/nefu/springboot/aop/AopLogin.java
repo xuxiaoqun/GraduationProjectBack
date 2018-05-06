@@ -1,4 +1,4 @@
-/*package com.nefu.springboot.aop;
+package com.nefu.springboot.aop;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -23,15 +23,17 @@ public class AopLogin {
 			+ " execution(* com.nefu.springboot.controller.TakeOrderController.*(..)) or"
 			+ " execution(* com.nefu.springboot.controller.BusinessController.*(..)) &&"
 			+ "!execution(* com.nefu.springboot.controller.BusinessController.getHotelProduceInfo(..)) &&"
-			+ "!execution(* com.nefu.springboot.controller.BusinessController.getHotelProInfoById(..))")
+			+ "!execution(* com.nefu.springboot.controller.BusinessController.getHotelProInfoById(..)) &&"
+			+ "!execution(* com.nefu.springboot.controller.BusinessController.getProInfoById(..)) &&"
+			+ "!execution(* com.nefu.springboot.controller.BusinessController.getEvaluationByHotelId(..))")
 	public void login() throws Throwable {
 		ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
 		HttpServletRequest request = attributes.getRequest();
 		Consumer consumer = (Consumer) request.getSession().getAttribute("consumer");
+		log.info("服务器端产生的sessionid:" + request.getSession().getId());
 		log.info("consumer:"+consumer);
 		if (consumer == null) {
 			throw new LoginException();
 		}
 	}
 }
-*/

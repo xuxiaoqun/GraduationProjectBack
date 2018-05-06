@@ -196,54 +196,117 @@ public class HotelServiceImpl implements HotelService {
 
 	
 	@Override
-	public Map<String, Object> getHotelProInfoById(int hotel_id, String startDate, String endDate) {
-		Map<String, Object> parm = new HashMap<String, Object>();
-		parm.put("arrivalDate", startDate);
-		parm.put("leaveDate", endDate);
-		parm.put("hotel_id", hotel_id);
-		List<Map<String, Object>> hotelProList = hotelDao.getHotelProInfoById(parm);
-		if (hotelProList.size() == 0 || hotelProList.isEmpty()) {
-			return null;
-		}
+	public Map<String, Object> getHotelProInfoById(int hotel_id) {
+//		Map<String, Object> parm = new HashMap<String, Object>();
+//		parm.put("arrivalDate", startDate);
+//		parm.put("leaveDate", endDate);
+//		parm.put("hotel_id", hotel_id);
+		Map<String, Object> hotel = hotelDao.getHotelProInfoById(hotel_id);
+		String[] picture = MapUtils.getString(hotel, "picture").split(",");
+		hotel.put("picture", picture);
+		String[] flag = MapUtils.getString(hotel, "flag").split(",");
+		hotel.put("flag", flag);
+//		if (hotelProList.size() == 0 || hotelProList.isEmpty()) {
+//			return null;
+//		}
 		
-		Map<String, Object> hotelProData = new HashMap<String, Object>();
-		List<Map<String, Object>> proList = new ArrayList<Map<String, Object>>();
-		
-		//组装数据格式
-		for(Map<String, Object> hotelPro : hotelProList){
-			hotelProData.put("hotel_address", MapUtils.getString(hotelPro, "hotel_address"));
-			
-			hotelProData.put("hotel_grade", MapUtils.getFloat(hotelPro, "hotel_grade"));
-			hotelProData.put("hotel_id", MapUtils.getInteger(hotelPro, "hotel_id"));
-			hotelProData.put("hotel_name", MapUtils.getString(hotelPro, "hotel_name"));
-			hotelProData.put("hotel_phone", MapUtils.getString(hotelPro, "hotel_phone"));
-			hotelProData.put("hotel_star", MapUtils.getString(hotelPro, "hotel_star"));
-			hotelProData.put("hotel_opemTime", MapUtils.getString(hotelPro, "hotel_opemTime"));
-
-			String[] hotel_picture = MapUtils.getString(hotelPro, "hotel_picture").split(",");
-			hotelProData.put("hotel_picture", hotel_picture);
-			
-			String[] hotel_fag = MapUtils.getString(hotelPro, "hotel_fag").split(",");
-			hotelProData.put("hotel_fag", hotel_fag);
-			
-			Map<String, Object> pro = new HashMap<String, Object>();
-			pro.put("pro_houseType", MapUtils.getString(hotelPro, "pro_houseType"));
-			pro.put("pro_bedType", MapUtils.getString(hotelPro, "pro_bedType"));
-			pro.put("pro_price", MapUtils.getString(hotelPro, "pro_price"));
-			pro.put("pro_id", MapUtils.getInteger(hotelPro, "pro_id"));
-			pro.put("pt_restAmount", MapUtils.getString(hotelPro, "pt_restAmount"));
-			String[] pro_flag = MapUtils.getString(hotelPro, "pro_flag").split(",");
-			pro.put("pro_flag", pro_flag);
-			String[] pro_picture = MapUtils.getString(hotelPro, "pro_picture").split(",");
-			pro.put("pro_picture", pro_picture);
-			
-			proList.add(pro);
-			
-		}
-		
-		hotelProData.put("pro_info", proList);
-				
-		return hotelProData;
+//		Map<String, Object> hotelProData = new HashMap<String, Object>();
+//		List<Map<String, Object>> proList = new ArrayList<Map<String, Object>>();
+//		
+//		//组装数据格式
+//		for(Map<String, Object> hotelPro : hotelProList){
+//			hotelProData.put("hotel_address", MapUtils.getString(hotelPro, "hotel_address"));
+//			
+//			hotelProData.put("hotel_grade", MapUtils.getFloat(hotelPro, "hotel_grade"));
+//			hotelProData.put("hotel_id", MapUtils.getInteger(hotelPro, "hotel_id"));
+//			hotelProData.put("hotel_name", MapUtils.getString(hotelPro, "hotel_name"));
+//			hotelProData.put("hotel_phone", MapUtils.getString(hotelPro, "hotel_phone"));
+//			hotelProData.put("hotel_star", MapUtils.getString(hotelPro, "hotel_star"));
+//			hotelProData.put("hotel_opemTime", MapUtils.getString(hotelPro, "hotel_opemTime"));
+//
+//			String[] hotel_picture = MapUtils.getString(hotelPro, "hotel_picture").split(",");
+//			hotelProData.put("hotel_picture", hotel_picture);
+//			
+//			String[] hotel_fag = MapUtils.getString(hotelPro, "hotel_fag").split(",");
+//			hotelProData.put("hotel_fag", hotel_fag);
+//			
+//			Map<String, Object> pro = new HashMap<String, Object>();
+//			pro.put("pro_houseType", MapUtils.getString(hotelPro, "pro_houseType"));
+//			pro.put("pro_bedType", MapUtils.getString(hotelPro, "pro_bedType"));
+//			pro.put("pro_price", MapUtils.getString(hotelPro, "pro_price"));
+//			pro.put("pro_id", MapUtils.getInteger(hotelPro, "pro_id"));
+//			pro.put("pt_restAmount", MapUtils.getString(hotelPro, "pt_restAmount"));
+//			String[] pro_flag = MapUtils.getString(hotelPro, "pro_flag").split(",");
+//			pro.put("pro_flag", pro_flag);
+//			String[] pro_picture = MapUtils.getString(hotelPro, "pro_picture").split(",");
+//			pro.put("pro_picture", pro_picture);
+//			
+//			proList.add(pro);
+//			
+//		}
+//		
+//		hotelProData.put("pro_info", proList);
+//				
+		return hotel;
 	}
 
+	@Override
+	public List<Map<String, Object>> getProInfoById(String hotel_id,String arrivalDate,String leaveDate) throws Exception {
+		//需要返回的数据，房型的组合信息
+		List<Map<String, Object>> dataList = new ArrayList<Map<String, Object>>();
+		
+		Date arrivalDate1 = DateUtils.parseDate(arrivalDate, "yyyy-MM-dd");
+		Date leaveDate1 = DateUtils.parseDate(leaveDate, "yyyy-MM-dd");
+		List<Integer> produceIdList = hotelDao.getProduceIdByHotelId(Integer.valueOf(hotel_id));
+		for(Integer produce_id : produceIdList){
+			dataList.add(siftings( produce_id, arrivalDate1, leaveDate1));
+		}
+		return dataList;
+	}
+	
+	/**
+	 * 根据房型id、入住日期、离店日期查找当前房型是否还有空房
+	 * @param produce_id
+	 * @param arrivalDate
+	 * @param leaveDate
+	 * @return
+	 */
+	public Map<String, Object> siftings(int produce_id, Date arrivalDate,Date leaveDate){
+		Map<String, Object> parm = new HashMap<String, Object>();
+		parm.put("produce_id", produce_id);
+		int days = (int) ((leaveDate.getTime() - arrivalDate.getTime()) / (1000*3600*24));
+		//初始值，越大越好，表示满足用户查询条件的空房数
+		int restAmount = 100;
+		Map<String, Object> pro = new HashMap<String, Object>();
+		for(int i = 0; i < days; i++){
+			parm.put("arrivalDate", DateFormatUtils.format(DateUtils.addDays(arrivalDate, i), "yyyy-MM-dd"));
+			parm.put("leaveDate", DateFormatUtils.format(DateUtils.addDays(arrivalDate, i + 1), "yyyy-MM-dd"));
+			pro = hotelDao.getProInfoById(parm);
+			log.info("当前房型信息:" + pro);
+			//如果当前房型的剩余数量小于restAmount，即restAmount = 当前房型的剩余数量
+			if (pro != null) {
+				if (MapUtils.getInteger(pro, "pt_restAmount") <  restAmount) {
+					restAmount = MapUtils.getInteger(pro, "pt_restAmount");
+				}
+			}else{
+				throw new RuntimeException();
+			}
+			
+		}
+		String[] pro_picture = MapUtils.getString(pro, "pro_picture").split(",");
+		pro.put("pro_picture", pro_picture);
+		String[] pro_flag = MapUtils.getString(pro, "pro_flag").split(",");
+		pro.put("pro_flag", pro_flag);
+		pro.put("pt_restAmount", restAmount);
+		
+		return pro;
+	}
+
+	@Override
+	public List<Map<String, Object>> getEvaluationByHotelId(String hotel_id) {
+		
+		return hotelDao.getEvaluationByHotelId(Integer.valueOf(hotel_id));
+	}
+
+	
 }

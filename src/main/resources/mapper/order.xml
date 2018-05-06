@@ -4,11 +4,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.nefu.springboot.dao.OrderDao">
 	<insert id="saveOrder" parameterType="com.nefu.springboot.vo.Order">
-		insert into graduation.order value(null,#{consumer_id},#{occupant_name},#{occupant_email},#{produce_id},#{arrivalDate},#{leaveDate},#{order_time},#{is_payment},#{order_total},#{produce_amount},#{hotel_id})
+		insert into graduation.order value(null,#{consumer_id},#{occupant_name},#{occupant_email},#{produce_id},#{arrivalDate},#{leaveDate},#{order_time},#{is_payment},#{order_total},#{produce_amount},#{hotel_id},#{order_status})
 	</insert>
 	
 	<select id="getConsumerByHotelId" parameterType="int" resultType="hashmap">
-		select c.name, c.email
+		select c.name, c.email,c.id
 		      from hotel h, consumer c
 			  where h.consumer_id = c.id
               and h.hotel_id = #{hotel_id}
@@ -21,8 +21,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	</select>
 	
 	<select id="getOrderByConsumerId" resultType="hashmap" parameterType="int">
-		select h.hotel_id,h.name,h.address,h.phone,p.houseType,p.bedType,
-		       o.arrivalDate,o.leaveDate,o.order_id,o.occupant_name,
+		select h.hotel_id,h.name,h.address,h.phone,p.houseType,p.bedType,p.produce_id,
+		       o.arrivalDate,o.leaveDate,o.order_id,o.occupant_name,o.order_status,
                o.occupant_email,o.is_payment,o.order_total,o.order_time,o.produce_amount
                from hotel h, produce p,graduation.order o
                where h.hotel_id = o.hotel_id
@@ -32,5 +32,102 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	</select>
 	<update id="updateIsPay" parameterType="hashmap">
 		update graduation.order set is_payment = #{is_payment} where order_id = #{order_id}
+	</update>
+	
+	<insert id="savePayment" parameterType="hashmap">
+		insert into payment value(null,#{order_id},#{payType},#{payAmount},#{reason_refund},#{status})
+	</insert>
+	
+	<select id="getPayment" parameterType="int" resultType="hashmap">
+		select o.order_id,o.occupant_name,o.occupant_email,o.arrivalDate,o.consumer_id,
+		       o.leaveDate,o.produce_amount,o.order_total,o.hotel_id,o.order_status,
+			   p.payAmount,p.payType,p.status,h.name,pro.houseType,pro.produce_id
+               from graduation.order o ,payment p,hotel h,produce pro
+               where o.hotel_id in 
+               (select h.hotel_id from hotel h
+               where h.consumer_id = #{consumer_id})
+               and o.is_payment = 'Y'
+               and p.order_id = o.order_id
+               and o.hotel_id = h.hotel_id
+               and o.produce_id = pro.produce_id
+               order by p.pay_id 
+	</select>
+	
+	<select id="getAllOrder">
+		select * from order
+	</select>
+	<update id="updateOrderStatus" parameterType="hashmap">
+		update graduation.order set order_status = #{order_status} where order_id = #{order_id}
+	</update>
+	<select id="getPaymentByOrderId" parameterType="int">
+		select * from payment p where p.order_id = #{order_id}
+	</select>
+	
+	<select id="getevaluationByOrderId" parameterType="int">
+		select * from evaluation where order_id = #{order_id}
+	</select>
+	
+	<select id="getRestAmount" parameterType="com.nefu.springboot.vo.PayOrder" resultType="hashmap">
+		select pt.restAmount
+		       from produce_time pt,produce p
+               where pt.produce_id = p.produce_id
+               and p.hotel_id = #{hotel_id}
+               and p.produce_id = #{produce_id}
+			   and pt.arrivalDate = #{arrivalDate}
+			   and pt.leaveDate = #{leaveDate}
+			   and p.status = 'Y'
+	</select>
+	<update id="updatePaystatus" parameterType="hashmap">
+		update payment set status = #{status},reason_refund = #{reason_refund} where order_id = #{order_id}
+	</update>
+	
+	<update id="updateProduceTime" parameterType="hashmap">
+		update produce_time set restAmount = #{restAmount}
+			   where produce_id = #{produce_id}
+			   and arrivalDate = #{arrivalDate}
+			   and leaveDate = #{leaveDate}
+	</update>
+	<update id="updateProduceTimeAdd" parameterType="hashmap">
+		update produce_time set restAmount = restAmount + #{restAmount}
+			   where produce_id = #{produce_id}
+			   and arrivalDate = #{arrivalDate}
+			   and leaveDate = #{leaveDate}
+	</update>
+	<select id="getNoEvaluation" parameterType="int" resultType="hashmap">
+		select h.name,p.houseType,o.order_time,o.order_id,h.hotel_id
+		       from graduation.`order`o ,hotel h,produce p
+               where  o.hotel_id = h.hotel_id
+               and o.produce_id = p.produce_id
+			   and o.consumer_id = #{consumer_id}
+			   and o.order_status = '已消费'
+	</select>
+	<select id="getEvaluation" parameterType="int" resultType="hashmap">
+		select h.name,p.houseType,o.order_time,o.order_id,e.msg,e.grade,h.hotel_id
+			   from graduation.`order`o ,evaluation e,hotel h,produce p
+               where o.order_id = e.order_id
+               and o.produce_id = p.produce_id
+               and o.hotel_id = h.hotel_id
+               and o.consumer_id = #{consumer_id}
+	</select>
+	
+	<insert id="saveEvaluation" parameterType="hashmap">
+		insert into evaluation value(null,#{order_id},#{msg},#{grade},#{eva_date})
+	</insert>
+	<select id="getRefundInfo" parameterType="int" resultType="hashmap">
+		select py.payAmount,o.consumer_id,o.produce_id,o.arrivalDate,o.leaveDate,o.produce_amount,o.hotel_id
+		       from graduation.order o,payment py
+               where o.order_id = py.order_id
+               and o.order_id = #{order_id}
+	</select>
+	
+	<update id="updateHotelGrade" parameterType="int">
+		update hotel INNER JOIN 
+               (select round(avg(e.grade),1) avg_grade
+               from evaluation e,hotel h,graduation.order o
+               where e.order_id = o.order_id
+               and o.hotel_id = h.hotel_id
+               and o.hotel_id = 13) avg
+               set grade = avg.avg_grade
+               where hotel_id = 13
 	</update>
 </mapper>

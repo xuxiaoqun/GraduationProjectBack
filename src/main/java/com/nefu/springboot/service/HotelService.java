@@ -78,11 +78,24 @@ public interface HotelService {
 	public List<Map<String, Object>> getHotelProduceInfo(String startDate, String endDate);
 
 	/**
-	 * 获取单个酒店下的房型信息
+	 * 获取单个酒店下的酒店信息
 	 * 
 	 * @param hotel_id
 	 * @return
 	 */
-	public Map<String, Object> getHotelProInfoById(int hotel_id, String startDate, String endDate);
+	public Map<String, Object> getHotelProInfoById(int hotel_id);
+	
+	/**
+	 * 根据酒店id和入住日期离店日期查找相关房型
+	 * @param parm
+	 * @return
+	 */
+	public List<Map<String, Object>> getProInfoById(String hotel_id,String arrivalDate,String leaveDate) throws Exception;
 
+	/**
+	 * 根据酒店id查看当前酒店下的所有评价
+	 * @param hotel_id
+	 * @return
+	 */
+	public List<Map<String, Object>> getEvaluationByHotelId(String hotel_id);
 }

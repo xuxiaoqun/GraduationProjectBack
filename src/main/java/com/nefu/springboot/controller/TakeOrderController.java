@@ -1,5 +1,6 @@
 package com.nefu.springboot.controller;
 
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,7 @@ import com.nefu.springboot.service.OrderService;
 import com.nefu.springboot.vo.Account;
 import com.nefu.springboot.vo.Credit;
 import com.nefu.springboot.vo.Order;
+import com.nefu.springboot.vo.PayOrder;
 
 @RestController
 public class TakeOrderController {
@@ -82,8 +84,45 @@ public class TakeOrderController {
 	}
 	
 	@RequestMapping("/goPay")
-	public Boolean  balancePay(String consumer_id, String payAmount, String payType ,String order_id, String hotel_id){
+	public Map<String, Object>  balancePay(String consumer_id, String payAmount, String payType ,
+			String order_id, String hotel_id){
 		log.info("用户id:" + consumer_id + ", 支付金额：" + payAmount + ",支付方式:" + payType + ",订单id:" + order_id + ",酒店id:" + hotel_id);
 		return orderService.goPay(consumer_id, payAmount, payType, order_id, hotel_id);
+	}
+	
+	@RequestMapping("/getPayment")
+	public Map<String, Object> getPayment(String id){
+		log.info("当前商家id:" + id);
+		return orderService.getPayment(id);
+	}
+	
+	@RequestMapping("sureOrder")
+	public Map<String, Object> sureOrder(PayOrder payOrder) throws ParseException{
+		log.info("商家确认的订单为：" + payOrder + ", 商家返回的状态：" + payOrder.getOrder_status());
+		return orderService.isSureOrder(payOrder);
+	}
+	
+	@RequestMapping("/checkIn")
+	public Boolean checkIn(PayOrder payOrder){
+		orderService.updateStatus(payOrder.getOrder_id(), "Y", "已消费");
+		return true;
+	}
+	
+	@RequestMapping("/getUsedOrder")
+	public Map<String, Object> getUsedOrder(String id){
+		return orderService.getUsedOrder(id);
+	}
+	
+	@RequestMapping("/saveEvaluation")
+	public Boolean saveEvaluation(int order_id, int hotel_id, String msg, Float grade){
+		orderService.saveEvaluation(order_id, hotel_id, msg, grade);
+		return true;
+	}
+	
+	@RequestMapping("/applyRefund")
+	public Boolean applyRefund(int order_id) throws Exception{
+		log.info("需要退款的订单id：" + order_id);
+		orderService.applyapplyRefund(order_id);
+		return true;
 	}
 }

@@ -73,6 +73,11 @@ public interface ConsumerService {
 	 */
 	public void updateAccountandBill(Account account);
 	
+	/**
+	 * 获取账户余额
+	 * @param consumer_id
+	 * @return
+	 */
 	public Account getAccountBalance(int consumer_id);
 	
 }

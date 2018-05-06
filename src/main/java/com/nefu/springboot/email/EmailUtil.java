@@ -3,6 +3,8 @@ package com.nefu.springboot.email;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -12,6 +14,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class EmailUtil {
+	
+	private static final Logger log = LoggerFactory.getLogger(EmailUtil.class);
 
 	@Autowired
 	private JavaMailSender mailSender = new JavaMailSenderImpl();
@@ -34,7 +38,7 @@ public class EmailUtil {
 		helper.setTo(sendEmail);
 		helper.setSubject(subject);
 		helper.setText(text, true);
-		System.out.println(fromEmail);
+		log.info("收件人的email：" + sendEmail);
 		mailSender.send(mimeMessage);
 	}
 }

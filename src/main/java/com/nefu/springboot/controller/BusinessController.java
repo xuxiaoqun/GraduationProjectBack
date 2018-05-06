@@ -4,7 +4,6 @@ import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +37,7 @@ public class BusinessController {
 	
 	@RequestMapping("/getHotelInfo")
 	public List<Map<String, Object>> getHotelInfo(String id){
-		log.info("获取当前用户的id:" + id);
+		log.info("获取当前商家的id:" + id);
 		return hotelService.getHotelInfo(id == null || id == "" ? 0 : Integer.valueOf(id));
 	}
 	
@@ -89,11 +88,23 @@ public class BusinessController {
 	
 	@RequestMapping("/getHotelProInfo")
 	public List<Map<String, Object>> getHotelProduceInfo(String startDate,String endDate) {
+		log.info("入住日期：" + startDate + ",离开日期：" + endDate);
 		return hotelService.getHotelProduceInfo(startDate,endDate);
 	}
 	
 	@RequestMapping("/getHotelProInfoById")
-	public Map<String, Object> getHotelProInfoById(String hotel_id,String startDate,String endDate) {
-		return hotelService.getHotelProInfoById(Integer.valueOf(hotel_id), startDate, endDate);
+	public Map<String, Object> getHotelProInfoById(String hotel_id) {
+		return hotelService.getHotelProInfoById(Integer.valueOf(hotel_id));
+	}
+	
+	@RequestMapping("/getProInfoById")
+	public List<Map<String, Object>> getProInfoById(String hotel_id,String arrivalDate,String leaveDate) throws Exception{
+		log.info("酒店id:" + hotel_id + ", 入住日期：" + arrivalDate + ", 离店日期：" + leaveDate);
+		return hotelService.getProInfoById(hotel_id, arrivalDate, leaveDate);
+	}
+	
+	@RequestMapping("/getEvaluation")
+	public List<Map<String, Object>> getEvaluationByHotelId(String hotel_id){
+		return hotelService.getEvaluationByHotelId(hotel_id);
 	}
 }

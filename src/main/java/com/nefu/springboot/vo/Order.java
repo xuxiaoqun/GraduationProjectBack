@@ -18,6 +18,7 @@ public class Order {
 	private String is_payment;
 	private int order_total;
 	private int produce_amount;
+	private String order_status;
 	public int getOrder_id() {
 		return order_id;
 	}
@@ -91,12 +92,20 @@ public class Order {
 	public void setProduce_amount(int produce_amount) {
 		this.produce_amount = produce_amount;
 	}
+	
+	public String getOrder_status() {
+		return order_status;
+	}
+	public void setOrder_status(String order_status) {
+		this.order_status = order_status;
+	}
 	@Override
 	public String toString() {
 		return "Order [order_id=" + order_id + ", hotel_id=" + hotel_id + ", consumer_id=" + consumer_id
 				+ ", occupant_name=" + occupant_name + ", occupant_email=" + occupant_email + ", produce_id="
 				+ produce_id + ", arrivalDate=" + arrivalDate + ", leaveDate=" + leaveDate + ", order_time="
 				+ order_time + ", is_payment=" + is_payment + ", order_total=" + order_total + ", produce_amount="
-				+ produce_amount + "]";
+				+ produce_amount + ", order_status=" + order_status + "]";
 	}
+	
 }

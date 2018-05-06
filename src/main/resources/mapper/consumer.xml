@@ -35,6 +35,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		insert into bill value(null,#{account_id},#{recharge},#{consume})
 	</insert>
 	<select id="getBill" parameterType="int" resultType="com.nefu.springboot.vo.Bill">
-		select * from bill where account_id = #{account_id}
+		select * from bill where account_id = #{account_id} order by bill_id desc
 	</select>
 </mapper>

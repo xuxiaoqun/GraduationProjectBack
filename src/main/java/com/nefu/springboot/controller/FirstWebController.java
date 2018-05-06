@@ -2,6 +2,8 @@ package com.nefu.springboot.controller;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,6 +17,7 @@ import com.nefu.springboot.vo.Consumer;
 public class FirstWebController {
 	
 	private static final String destinationName = "email.queue";
+	private static final Logger log = LoggerFactory.getLogger(FirstWebController.class);
 
 	
 	@Autowired
@@ -54,8 +57,10 @@ public class FirstWebController {
 	@ResponseBody
 	public Consumer login(Consumer consumer,HttpServletRequest request){
 		if (consumerService.isLogin(consumer)) {
-			request.getSession().setAttribute("consumer", consumer);
-			return consumerService.getConsumerByEmail(consumer.getEmail());
+			Consumer c1 = consumerService.getConsumerByEmail(consumer.getEmail());
+			request.getSession(true).setAttribute("consumer", c1);
+			log.info("服务器端产生的sessionid1:" + request.getSession().getId());
+			return c1;
 		}
 		return null;
 	};
@@ -67,4 +72,18 @@ public class FirstWebController {
 		return true;
 	}
 	
+	@RequestMapping("/logout")
+	@ResponseBody
+	public Boolean logout(HttpServletRequest request){
+		request.getSession().removeAttribute("consumer");
+		return true;
+	}
+	
+	@RequestMapping("/getConsumer")
+	@ResponseBody
+	public Consumer getConsumer(HttpServletRequest request){
+		Consumer consumer = (Consumer) request.getSession().getAttribute("consumer");
+		consumer.setIdentifyingCode("");
+		return consumer;
+	}
 }

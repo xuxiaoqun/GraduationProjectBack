@@ -49,7 +49,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	
 	<!-- 房型日期的相关sql操作 -->
 	<insert id="addProduceTime" parameterType="hashmap">
-		insert into produce_time value(null,#{produce_id},#{startDate},#{endDate},#{isReserve},#{restAmount})
+		insert into produce_time value(null,#{produce_id},#{arrivalDate},#{leaveDate},#{restAmount})
 	</insert>
 	
 	<update id="updatePro" parameterType="com.nefu.springboot.vo.Produce">
@@ -70,12 +70,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			   from hotel h, produce p, produce_time pt
 			   where h.hotel_id = p.hotel_id
                and p.status = "Y"
-               and pt.arrivalDate = #{arrivalDate}
-               and pt.leaveDate = #{leaveDate}
+             <!--   and pt.arrivalDate = #{arrivalDate}
+               and pt.leaveDate = #{leaveDate} -->
                group by h.hotel_id
 	</select>
-	<select id="getHotelProInfoById" parameterType="hashmap" resultType="hashmap">
-		select h.hotel_id as hotel_id,
+	<select id="getHotelProInfoById" parameterType="int" resultType="hashmap">
+		<!-- select h.hotel_id as hotel_id,
 			   h.name as hotel_name,
 			   h.address hotel_address,
 			   h.star as hotel_star,
@@ -97,27 +97,36 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			   and h.hotel_id = #{hotel_id}
                and pt.arrivalDate = #{arrivalDate}
                and pt.leaveDate = #{leaveDate}
-               and p.status = 'Y'
+               and p.status = 'Y' -->
+               select * from hotel where hotel_id = #{hotel_id}
 	</select>
 	
-	<!-- <resultMap type="hashmap" id="hotelProInfoMap" >
-		<id column="hotel_id" property="hotel_id"/>
-		<result column="hotel_name" property="hotel_name"/>
-		<result column="hotel_address" property="hotel_address"/>
-		<result column="hotel_star" property="hotel_star"/>
-		<result column="hotel_phone" property="hotel_phone"/>
-		<result column="hotel_fag" property="hotel_fag"/>
-		<result column="hotel_picture" property="hotel_picture"/>
-		<result column="hotel_grade" property="hotel_grade"/>
-		<collection property="pro_info" ofType="hashmap">
-			<id column="pro_id" property="proId"/>
-			<result column="pro_houseType" property="pro_houseType"/>
-			<result column="pro_bedType" property="pro_bedType"/>
-			<result column="pro_picture" property="pro_picture"/>
-			<result column="pro_price" property="pro_price"/>
-			<result column="pro_flag" property="pro_flag"/>
-			<result column="pt_restAmount" property="pt_restAmount"/>
-		</collection>
-	</resultMap> -->
+	<select id="getProInfoById" parameterType="hashmap" resultType="hashmap">
+		select p.produce_id as pro_id,
+ 			   p.houseType as pro_houseType,
+ 			   p.bedType as pro_bedType,
+ 			   p.picture as pro_picture,
+ 			   p.price as pro_price,
+ 			   p.flag as pro_flag,
+ 			   pt.restAmount as pt_restAmount
+               from produce p,produce_time pt
+               where  p.produce_id = pt.produce_id
+			   and pt.produce_id = #{produce_id}
+               and pt.arrivalDate = #{arrivalDate}
+               and pt.leaveDate = #{leaveDate}
+               and p.status = 'Y'
+	</select>
+	<select id="getProduceIdByHotelId" parameterType="int" resultType="int">
+		select produce_id from produce where hotel_id = #{hotel_id}
+	</select>
 	
+	<select id="getEvaluationByHotelId" parameterType="int" resultType="hashmap">
+		select c.name as 'consumer_name',p.houseType,e.msg as 'eva_msg',e.grade as 'eva_grade',e.eva_date
+			   from evaluation e,hotel h,graduation.order o,produce p,consumer c
+               where e.order_id = o.order_id
+  			   and o.hotel_id = h.hotel_id
+               and o.produce_id = p.produce_id
+               and o.consumer_id = c.id
+               and h.hotel_id = #{hotel_id}
+	</select>
 </mapper>

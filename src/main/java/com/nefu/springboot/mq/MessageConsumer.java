@@ -70,14 +70,18 @@ public class MessageConsumer {
 		String flag = msg.split(",")[0];
 		String email = msg.split(",")[1];
 		String name = msg.split(",")[2];
+		String flag1 = msg.split(",")[3];
 		Map<String, Object> model = new HashMap<String, Object>();
 		try {
 			model.put("email", email);
 			model.put("name", name);
+			model.put("flag", flag1);
 			String emailText = "";
 			if(flag.equals("0")){
+				log.info("商家的回应：" + flag1);
 				emailText = emailServiceImpl.emailInformConsumer(model);
 			}else{
+				
 				emailText = emailServiceImpl.emailInformBusiness(model);
 			}
 			

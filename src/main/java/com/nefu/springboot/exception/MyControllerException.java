@@ -34,9 +34,10 @@ public class MyControllerException {
 		return map;
 	}
 	
+	@ResponseBody
 	@ExceptionHandler(value = LoginException.class)
-	public String loginHandler(){
-		return "login";
+	public Boolean loginHandler(){
+		return false;
 		
 	}
 }
